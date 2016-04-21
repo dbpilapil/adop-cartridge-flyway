@@ -198,7 +198,8 @@ packageSql.with{
             |-v /var/run/docker.sock:/var/run/docker.sock \\
             |-v jenkins_slave_home:/jenkins_slave_home/ \\
             |kramos/alpine-zip \\
-            |-r '''.stripMargin() + referenceAppGitRepo + '''${b}.zip''')
+            |-r '''.stripMargin() + referenceAppGitRepo + '''/jenkins_slave_home/$JOB_NAME/${b}.zip
+            |/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/''')
   }
   publishers{
     archiveArtifacts("**/*zip")
@@ -206,7 +207,7 @@ packageSql.with{
       trigger(projectFolderName + "/ST_Deploy"){
         condition("UNSTABLE_OR_BETTER")
         parameters{
-          predefinedProp("B",'${B}')
+          predefinedProp("B",'${BUILD_NUMBER}')
           predefinedProp("PARENT_BUILD", '${JOB_NAME}')
         }
       }
