@@ -198,7 +198,7 @@ packageSql.with{
             |-v /var/run/docker.sock:/var/run/docker.sock \\
             |-v jenkins_slave_home:/jenkins_slave_home/ \\
             |kramos/zip \\
-            |-r '''.stripMargin() + referenceappgitrepo + '''${b}.zip''')
+            |-r '''.stripMargin() + referenceAppGitRepo + '''${b}.zip''')
   }
   publishers{
     archiveartifacts("**/*zip")
