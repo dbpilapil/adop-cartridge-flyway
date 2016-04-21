@@ -112,8 +112,31 @@ ciDeploy.with{
     }
     shell('''set -x
             |echo Spin up a DB in a container run FlyWay against it and then kill the container
-            |docker run --name ci-mysql-instance -e MYSQL_ROOT_PASSWORD=password -d mysql:latest
-	    |docker run -it --rm -v jenkins_slave_home:/jenkins_slave_home/ --entrypoint="dockerlint" shouldbee/flyway -f /jenkins_slave_home/$JOB_NAME/Dockerfile
+            |
+            |docker rm -f ci-mysql-instance || true
+            |
+            |docker network rm ci-net || true
+            |docker network create ci-net
+            |
+            |docker run -v /var/run/docker.sock:/var/run/docker.sock \
+            |--net=ci-net \
+            |--name ci-mysql-instance \
+            |-e MYSQL_ROOT_PASSWORD=password \
+            |-e MYSQL_DATABASE=ci \
+            |-d mysql:latest
+            |
+            |sleep 5s
+            |
+            |docker run -v /var/run/docker.sock:/var/run/docker.sock \
+            |--rm -v jenkins_slave_home:/jenkins_slave_home/ \
+            |--net=ci-net \
+            |shouldbee/flyway \
+            |-locations=/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \
+            |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password migrate
+            |
+            |
+            |docker rm -f ci-mysql-instance
+            |docker network rm ci-net
             |'''.stripMargin())
   }
   publishers{
