@@ -197,7 +197,7 @@ packageSql.with{
             |docker run --rm \\
             |-v /var/run/docker.sock:/var/run/docker.sock \\
             |-v jenkins_slave_home:/jenkins_slave_home/ \\
-            |kramos/zip \\
+            |kramos/alpine-zip \\
             |-r '''.stripMargin() + referenceAppGitRepo + '''${b}.zip''')
   }
   publishers{
