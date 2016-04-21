@@ -127,6 +127,15 @@ ciDeploy.with{
             |
             |sleep 10s
             |
+            |printf "Preview!\n"
+            |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
+            |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
+            |--net=ci-net \\
+            |shouldbee/flyway \\
+            |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
+            |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password info
+            |
+            |printf "Executing the scripts!\n"
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
             |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
             |--net=ci-net \\
@@ -134,6 +143,13 @@ ciDeploy.with{
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
             |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password migrate
             |
+            |printf "End state!\n"
+            |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
+            |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
+            |--net=ci-net \\
+            |shouldbee/flyway \\
+            |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
+            |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password info
             |
             |docker rm -f ci-mysql-instance
             |docker network rm ci-net
