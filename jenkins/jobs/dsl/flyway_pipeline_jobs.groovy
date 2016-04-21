@@ -114,45 +114,50 @@ ciDeploy.with{
             |echo Spin up a DB in a container run FlyWay against it and then kill the container
             |
             |MYSQL_CONT=ci-mysql-instance${RANDOM}
+            |MYSQL_NET=ci-net${RANDOM}
             |
-            |docker network rm ci-net || true
-            |docker network create ci-net
+            |docker network create $MYSQL_NET
             |
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
-            |--net=ci-net \\
+            |--net=$MYSQL_NET \\
             |--name ${MYSQL_CONT} \\
             |-e MYSQL_ROOT_PASSWORD=password \\
             |-e MYSQL_DATABASE=ci \\
             |-d mysql:latest
             |
-            |sleep 10s
+
+            |while ! docker run --rm --net=$MYSQL_NET mysql:latest mysql -h $MYSQL_CONT -u root --password=password -e 'show databases;' 
+            |do
+            |echo Waiting for MYSQL to come up
+            |sleep 3
+            |done
             |
-            |printf "Preview!\n"
+            |printf "Preview!\\n"
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
             |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
-            |--net=ci-net \\
+            |--net=$MYSQL_NET \\
             |shouldbee/flyway \\
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
             |-url=jdbc:mysql://${MYSQL_CONT}/ci -user=root -password=password info
             |
-            |printf "Executing the scripts!\n"
+            |printf "Executing the scripts!\\n"
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
             |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
-            |--net=ci-net \\
+            |--net=$MYSQL_NET \\
             |shouldbee/flyway \\
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
             |-url=jdbc:mysql://${MYSQL_CONT}/ci -user=root -password=password migrate
             |
-            |printf "End state!\n"
+            |printf "End state!\\"
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
             |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
-            |--net=ci-net \\
+            |--net=$MYSQL_NET \\
             |shouldbee/flyway \\
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
             |-url=jdbc:mysql://${MYSQL_CONT}/ci -user=root -password=password info
             |
             |docker rm -f $MYSQL_CONT
-            |docker network rm ci-net
+            |docker network rm $MYSQL_NET
             |'''.stripMargin())
   }
   publishers{
