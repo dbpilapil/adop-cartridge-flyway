@@ -113,14 +113,14 @@ ciDeploy.with{
     shell('''set -x
             |echo Spin up a DB in a container run FlyWay against it and then kill the container
             |
-            |docker rm -f ci-mysql-instance || true
+            |MYSQL_CONT=ci-mysql-instance${RANDOM}
             |
             |docker network rm ci-net || true
             |docker network create ci-net
             |
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
             |--net=ci-net \\
-            |--name ci-mysql-instance \\
+            |--name ${MYSQL_CONT} \\
             |-e MYSQL_ROOT_PASSWORD=password \\
             |-e MYSQL_DATABASE=ci \\
             |-d mysql:latest
@@ -133,7 +133,7 @@ ciDeploy.with{
             |--net=ci-net \\
             |shouldbee/flyway \\
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
-            |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password info
+            |-url=jdbc:mysql://${MYSQL_CONT}/ci -user=root -password=password info
             |
             |printf "Executing the scripts!\n"
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
@@ -141,7 +141,7 @@ ciDeploy.with{
             |--net=ci-net \\
             |shouldbee/flyway \\
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
-            |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password migrate
+            |-url=jdbc:mysql://${MYSQL_CONT}/ci -user=root -password=password migrate
             |
             |printf "End state!\n"
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
@@ -149,9 +149,9 @@ ciDeploy.with{
             |--net=ci-net \\
             |shouldbee/flyway \\
             |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
-            |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password info
+            |-url=jdbc:mysql://${MYSQL_CONT}/ci -user=root -password=password info
             |
-            |docker rm -f ci-mysql-instance
+            |docker rm -f $MYSQL_CONT
             |docker network rm ci-net
             |'''.stripMargin())
   }
@@ -193,16 +193,21 @@ packageSql.with{
           buildNumber('${B}')
       }
     }
-    shell('''set -x zip -r ''' + referenceAppGitRepo + '''${B}.zip''')
+    shell('''set -x
+            |docker run --rm \\
+            |-v /var/run/docker.sock:/var/run/docker.sock \\
+            |-v jenkins_slave_home:/jenkins_slave_home/ \\
+            |kramos/zip \\
+            |-r '''.stripmargin() + referenceappgitrepo + '''${b}.zip''')
   }
   publishers{
-    archiveArtifacts("**/*zip")
-    downstreamParameterized{
-      trigger(projectFolderName + "/ST_Deploy"){
-        condition("UNSTABLE_OR_BETTER")
+    archiveartifacts("**/*zip")
+    downstreamparameterized{
+      trigger(projectfoldername + "/st_deploy"){
+        condition("unstable_or_better")
         parameters{
-          predefinedProp("B",'${BUILD_NUMBER}')
-          predefinedProp("PARENT_BUILD", '${PARENT_BUILD}')
+          predefinedprop("b",'${build_number}')
+          predefinedprop("parent_build", '${parent_build}')
         }
       }
     }
