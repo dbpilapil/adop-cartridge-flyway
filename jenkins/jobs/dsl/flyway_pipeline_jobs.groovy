@@ -198,7 +198,7 @@ packageSql.with{
             |-v /var/run/docker.sock:/var/run/docker.sock \\
             |-v jenkins_slave_home:/jenkins_slave_home/ \\
             |kramos/alpine-zip \\
-            |-r '''.stripMargin() + referenceAppGitRepo + '''/jenkins_slave_home/$JOB_NAME/${b}.zip
+            |-jr '''.stripMargin() + referenceAppGitRepo + '''/jenkins_slave_home/$JOB_NAME/${b}.zip
             |/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/''')
   }
   publishers{
