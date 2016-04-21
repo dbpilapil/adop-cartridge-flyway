@@ -125,13 +125,13 @@ ciDeploy.with{
             |-e MYSQL_DATABASE=ci \\
             |-d mysql:latest
             |
-            |sleep 5s
+            |sleep 10s
             |
             |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
             |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
             |--net=ci-net \\
             |shouldbee/flyway \\
-            |-locations=/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
+            |-locations=filesystem:/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
             |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password migrate
             |
             |
