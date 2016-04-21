@@ -158,7 +158,7 @@ ciDeploy.with{
   publishers{
     archiveArtifacts("**/*")
     downstreamParameterized{
-      trigger(projectFolderName + "/Build"){
+      trigger(projectFolderName + "/Package_SQL"){
         condition("UNSTABLE_OR_BETTER")
         parameters{
           predefinedProp("B",'${B}')
@@ -194,14 +194,16 @@ packageSql.with{
       }
     }
     shell('''set -x
-            |echo zip '''.stripMargin())
+            |zip -r '''.stripMargin() +
+            |referenceAppGitRepo + ${B}.zip'''.stripMargin())
   }
   publishers{
+    archiveArtifacts("**/*zip")
     downstreamParameterized{
       trigger(projectFolderName + "/ST_Deploy"){
         condition("UNSTABLE_OR_BETTER")
         parameters{
-          predefinedProp("B",'${B}')
+          predefinedProp("B",'${BUILD_NUMBER}')
           predefinedProp("PARENT_BUILD", '${PARENT_BUILD}')
         }
       }
@@ -227,13 +229,13 @@ stDeploy.with{
   }
   label("docker")
   steps {
-    copyArtifacts("Get_SQL") {
+    copyArtifacts("Package_SQL") {
         buildSelector {
           buildNumber('${B}')
       }
     }
     shell('''set +x
-            |echo This will deploy to ST
+            |echo This would deploy to ST
             |'''.stripMargin())
   }
   publishers{
