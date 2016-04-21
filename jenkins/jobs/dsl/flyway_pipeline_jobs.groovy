@@ -118,20 +118,20 @@ ciDeploy.with{
             |docker network rm ci-net || true
             |docker network create ci-net
             |
-            |docker run -v /var/run/docker.sock:/var/run/docker.sock \
-            |--net=ci-net \
-            |--name ci-mysql-instance \
-            |-e MYSQL_ROOT_PASSWORD=password \
-            |-e MYSQL_DATABASE=ci \
+            |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
+            |--net=ci-net \\
+            |--name ci-mysql-instance \\
+            |-e MYSQL_ROOT_PASSWORD=password \\
+            |-e MYSQL_DATABASE=ci \\
             |-d mysql:latest
             |
             |sleep 5s
             |
-            |docker run -v /var/run/docker.sock:/var/run/docker.sock \
-            |--rm -v jenkins_slave_home:/jenkins_slave_home/ \
-            |--net=ci-net \
-            |shouldbee/flyway \
-            |-locations=/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \
+            |docker run -v /var/run/docker.sock:/var/run/docker.sock \\
+            |--rm -v jenkins_slave_home:/jenkins_slave_home/ \\
+            |--net=ci-net \\
+            |shouldbee/flyway \\
+            |-locations=/jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/ \\
             |-url=jdbc:mysql://ci-mysql-instance/ci -user=root -password=password migrate
             |
             |
