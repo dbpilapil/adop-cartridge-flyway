@@ -201,13 +201,13 @@ packageSql.with{
             |-r '''.stripMargin() + referenceAppGitRepo + '''${b}.zip''')
   }
   publishers{
-    archiveartifacts("**/*zip")
-    downstreamparameterized{
-      trigger(projectfoldername + "/st_deploy"){
-        condition("unstable_or_better")
+    archiveArtifacts("**/*zip")
+    downstreamParameterized{
+      trigger(projectFolderName + "/ST_Deploy"){
+        condition("UNSTABLE_OR_BETTER")
         parameters{
-          predefinedprop("b",'${build_number}')
-          predefinedprop("parent_build", '${parent_build}')
+          predefinedProp("B",'${B}')
+          predefinedProp("PARENT_BUILD", '${JOB_NAME}')
         }
       }
     }
