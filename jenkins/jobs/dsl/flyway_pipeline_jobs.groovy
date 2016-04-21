@@ -193,7 +193,7 @@ packageSql.with{
           buildNumber('${B}')
       }
     }
-    shell('''set -x zip -r ''' + referenceAppGitRepo + ${B}.zip''')
+    shell('''set -x zip -r ''' + referenceAppGitRepo + '''${B}.zip''')
   }
   publishers{
     archiveArtifacts("**/*zip")
