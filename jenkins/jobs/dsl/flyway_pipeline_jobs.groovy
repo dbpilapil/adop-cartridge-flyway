@@ -204,7 +204,7 @@ packageSql.with{
             |-v jenkins_slave_home:/jenkins_slave_home/ \\
             |kramos/alpine-zip \\
             |-jr /jenkins_slave_home/$JOB_NAME/${B}.zip /jenkins_slave_home/$JOB_NAME/src/main/resources/sql/migrations/
-            ''')
+            '''.stripMargin())
   }
   publishers{
     archiveArtifacts("**/*zip")
