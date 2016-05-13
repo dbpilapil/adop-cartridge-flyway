@@ -123,6 +123,7 @@ ciDeploy.with{
             |--name ${MYSQL_CONT} \\
             |-e MYSQL_ROOT_PASSWORD=password \\
             |-e MYSQL_DATABASE=ci \\
+            |-l ROLE=FLYWAYCARTDB \\
             |-d mysql:latest
             |
 
