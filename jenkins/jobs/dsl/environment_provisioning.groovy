@@ -26,7 +26,7 @@ environmentProvisioningPipelineView.with{
 createEnvironmentJob.with{
     description('''This job creates extra databases for deploying to.''')
     parameters {
-        predefinedProp('ENVIRONMENT_NAME', 'ST')
+        stringParam('ENVIRONMENT_NAME', 'ST')
     }
     label("docker")
     environmentVariables {
@@ -80,7 +80,7 @@ queue(createEnvironmentJob)
 destroyEnvironmentJob.with{
     description("This job deletes the environment.")
     parameters {
-        predefinedProp('ENVIRONMENT_NAME', 'ST')
+        stringParam('ENVIRONMENT_NAME', 'ST')
     }
     label("docker")
     environmentVariables {
