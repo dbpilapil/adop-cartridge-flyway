@@ -1,21 +1,16 @@
 # What is Cartridge?
 
-A Cartridge is a set of resources that are loaded into the Platform for a particular project. They may contain anything from a simple reference implementation for a technology to a set of best practice examples for building, deploying, and managing a technology stack that can be used by a project.
+A [Cartridge](http://accenture.github.io/adop-docker-compose/docs/operating/cartridges/) is a set of resources that are loaded into the Platform for a particular [ADOP](http://accenture.github.io/adop-docker-compose/) 	 project. They may contain anything from a simple reference implementation for a technology to a set of best practice examples for building, deploying, and managing a technology stack that can be used by a project.
 
-This cartridge consists of source code repositories and jenkins jobs.
+This cartridge consists of source code repositories and jenkins jobs for getting started with [Flyway](https://flywaydb.org/) and should help people get into DB migrations for Relational Databases.
 
 ## Source code repositories
 
-Cartrige loads the source code repositories
-
-
-* [Sample Docker file](https://github.com/Accenture/adop-jenkins.git)
+Cartrige loads a repo containing some example SQL.
 
 ## Jenkins Jobs
 
-This cartridge generates the jenkins jobs and pipeline views to perform Continuous Delivery of a Docker container
-
-* TODO: List jobs 
+This cartridge generates jenkins jobs to demonstrate a DB deployment using [Flyway](https://flywaydb.org/)
 
 # License
 Please view [license information](LICENSE.md) for the software contained on this image.
