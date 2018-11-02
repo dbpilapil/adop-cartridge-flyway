@@ -1,10 +1,17 @@
+import pluggable.scm.*;
+import adop.cartridge.properties.*;
+
+SCMProvider scmProvider = SCMProviderHandler.getScmProvider("${SCM_PROVIDER_ID}", binding.variables)
+CartridgeProperties cartridgeProperties = new CartridgeProperties("${CARTRIDGE_CUSTOM_PROPERTIES}");
+
 // Folders
 def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
+def projectScmNamespace = "${SCM_NAMESPACE}"
 
 // Variables
 def referenceAppGitRepo = "flyway-example"
-def referenceAppGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + referenceAppGitRepo
+def referenceAppGitUrl = cartridgeProperties.getProperty("scm.code.repo.name",referenceAppGitRepo)
 
 // Jobs
 def getSql = freeStyleJob(projectFolderName + "/Get_SQL")
@@ -32,15 +39,7 @@ getSql.with{
     maskPasswords()
     sshAgent("adop-jenkins-master")
   }
-  scm{
-    git{
-      remote{
-        url(referenceAppGitUrl)
-        credentials("adop-jenkins-master")
-      }
-      branch("*/master")
-    }
-  }
+  scm scmProvider.get(projectScmNamespace, referenceAppGitUrl, "*/master", "adop-jenkins-master", null)
   environmentVariables {
       env('WORKSPACE_NAME',workspaceFolderName)
       env('PROJECT_NAME',projectFolderName)
